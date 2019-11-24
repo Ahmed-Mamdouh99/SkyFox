@@ -1,5 +1,5 @@
 #include "SolidQuad.h"
-
+#include <math.h>
 
 SolidQuad::SolidQuad(float size_x, float size_y, float size_z,
 	float center_x, float center_y, float center_z, bool center_is_hind) :
@@ -39,15 +39,10 @@ void SolidQuad::move(float delta)
 // Test collision with another quad
 bool SolidQuad::intersect(SolidQuad* quad2)
 {
-	float max_x = center_hind.x + size.x;
-	float max_y = center_hind.y + size.y;
-	float max_z = center_hind.z + size.z;
-	float min_x = center_hind.x;
-	float min_y = center_hind.y;
-	float min_z = center_hind.z;
+	// Using AABB (Axis Aligned Bounding Box) check
 	return (
-		quad2->center.x >= min_x && quad2->center.x <= max_x &&
-		quad2->center.y >= min_y && quad2->center.y <= max_y &&
-		quad2->center.z >= min_z && quad2->center.z <= max_z
+		abs(center.x - quad2->center.x) < (size.x + quad2->size.x) &&
+		abs(center.y - quad2->center.y) < (size.y + quad2->size.y) &&
+		abs(center.z - quad2->center.z) < (size.z + quad2->size.z)
 	);
 }
