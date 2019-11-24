@@ -24,7 +24,7 @@ SolidQuad::SolidQuad(float size_x, float size_y, float size_z,
 	}
 };
 
-void SolidQuad::move(Vector3d<float>* delta)
+void SolidQuad::move(Vector3d* delta)
 {
 	center += delta;
 	center_hind += delta;
@@ -41,8 +41,8 @@ bool SolidQuad::intersect(SolidQuad* quad2)
 {
 	// Using AABB (Axis Aligned Bounding Box) check
 	return (
-		abs(center.x - quad2->center.x) < (size.x + quad2->size.x) &&
-		abs(center.y - quad2->center.y) < (size.y + quad2->size.y) &&
-		abs(center.z - quad2->center.z) < (size.z + quad2->size.z)
+		fabsf(center.x - quad2->center.x) < (size.x + quad2->size.x) &&
+		fabsf(center.y - quad2->center.y) < (size.y + quad2->size.y) &&
+		fabsf(center.z - quad2->center.z) < (size.z + quad2->size.z)
 	);
 }
