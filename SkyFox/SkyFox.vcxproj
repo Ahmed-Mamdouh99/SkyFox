@@ -79,6 +79,7 @@
     <ClCompile Include="include\GLTexture.cpp" />
     <ClCompile Include="include\Model_3DS.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="SolidQuad.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +89,11 @@
     <ClInclude Include="include\GLTexture.h" />
     <ClInclude Include="include\glut.h" />
     <ClInclude Include="include\Model_3DS.h" />
+    <ClInclude Include="Render.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="rng.h" />
     <ClInclude Include="SolidQuad.h" />
+    <ClInclude Include="Structs.h" />
     <ClInclude Include="Vector3d.h" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +105,9 @@
     <Library Include="include\glaux.lib" />
     <Library Include="include\glew32.lib" />
     <Library Include="include\glut32.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SkyFox.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
