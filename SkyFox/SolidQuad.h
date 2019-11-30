@@ -6,12 +6,9 @@ public:
 	Vector3d size;
 	Vector3d center;
 	Vector3d center_hind;
-	SolidQuad(float size_x, float size_y, float size_z,
-		float center_x, float center_y, float center_z, bool center_is_hind = false);
-	// Translate the solid's centers by a vector
-	void move(Vector3d* delta);
-	// Translate the solid's centers by a value on all dimensions
-	void move(float delta);
+	Vector3d rotation;
+	SolidQuad(float size_x=1.0f, float size_y=1.0f, float size_z=1.0f,
+		float center_x=0.0f, float center_y=0.0f, float center_z=0.0f, bool center_is_hind = false);
 	// Test collision with another quad
 	bool intersect(SolidQuad* quad2);
 };
