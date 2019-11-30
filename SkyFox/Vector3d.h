@@ -1,63 +1,62 @@
 #pragma once
-template <class T>
 class Vector3d
 {
 public:
-	T x;
-	T y;
-	T z;
+	float x;
+	float y;
+	float z;
 	// Constructors
 	Vector3d(){};
-	Vector3d(T _x, T _y, T _z)
+	Vector3d(float _x, float _y, float _z)
 		:x(_x), y(_y), z(_z)
 	{};
 	// Destructor
 	~Vector3d() {};
 
 	// Overloaded operators
-	void operator += (T v) {
+	void operator += (float v) {
 		x += v;
 		y += v;
 		z += v;
 	}
 
-	void operator += (Vector3d<T> *vb) {
+	void operator += (Vector3d *vb) {
 		x += vb->x;
 		y += vb->y;
 		z += vb->z;
 	}
 
-	void operator -= (T v) {
+	void operator -= (float v) {
 		x -= v;
 		y -= v;
 		z -= v;
 	}
 
-	void operator -= (Vector3d<T>* vb) {
+	void operator -= (Vector3d* vb) {
 		x -= vb->x;
 		y -= vb->y;
 		z -= vb->z;
 	}
 
-	void operator *= (T v) {
+	void operator *= (float v) {
 		x *= v;
 		y *= v;
 		z *= v;
 	}
 
-	void operator *= (Vector3d<T>* vb) {
+	void operator *= (Vector3d* vb) {
 		x *= vb->x;
 		y *= vb->y;
 		z *= vb->z;
 	}
 
-	void operator /= (T v) {
+	void operator /= (float v) {
 		x /= v;
 		y /= v;
 		z /= v;
 	}
 
-	void operator /= (Vector3d<T>* vb) {
+	void operator /= (Vector3d* vb) {
 		x /= vb->x;
 		y /= vb->y;
 		z /= vb->z;
