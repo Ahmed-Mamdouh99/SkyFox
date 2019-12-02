@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3d.h"
+#include "SolidQuad.h"
 
 struct Camera_t
 {
@@ -27,11 +28,19 @@ struct Background_t
 	float colorBlue;
 	float radius;
 	float shininess;
+	SolidQuad quad;
 	Background_t(float _countRed, float _countGreen,
-		float _countBlue, float _radius, float _shininess)
+		float _countBlue, float _radius, float _shininess,
+		float size_x, float size_y, float size_z,
+		float center_x, float center_y, float center_z,
+		bool center_is_hind)
 		:countRed(_countRed),
 		countGreen(_countGreen),
 		countBlue(_countBlue),
 		radius(_radius),
-		shininess(_shininess){}
+		shininess(_shininess),
+		quad(size_x, size_y, size_z,
+			center_x, center_y, center_z,
+			center_is_hind)
+	{}
 };

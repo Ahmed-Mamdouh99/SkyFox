@@ -42,11 +42,17 @@ void Render::Draw()
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	// Draw background
-	if(true){
+	{
+		glPushMatrix();
+		Background_t* bg = engine->GetBackground();
+		glTranslatef(bg->quad.center.x, bg->quad.center.y, bg->quad.center.z);
+		glScalef(bg->quad.size.x, bg->quad.size.y, bg->quad.size.z);
+		glRotatef(bg->quad.rotation.x, 1.0f, 0.0f, 0.0f);
+		glRotatef(bg->quad.rotation.y, 0.0f, 1.0f, 0.0f);
+		glRotatef(bg->quad.rotation.z, 0.0f, 0.0f, 1.0f);
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			Background_t* bg = engine->GetBackground();
-			glPushMatrix();
+			//glPushMatrix();
 			// Set solid colors
 			float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
 			float diffuse[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
@@ -62,7 +68,6 @@ void Render::Draw()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 		{
-			Background_t* bg = engine->GetBackground();
 			glPushMatrix();
 			// Set solid colors
 			float ambient[4] = { 1-bg->colorRed, 1-bg->colorGreen, 1-bg->colorBlue, 1.0f };
@@ -77,9 +82,10 @@ void Render::Draw()
 			glutSolidSphere(bg->radius*1.1, 100, 100); // TODO: Set default slices
 			glPopMatrix();
 		}
+		glPopMatrix();
 	}
 	// Set lights
-	if(true){
+	{
 		glEnable(GL_LIGHT0);
 		// Define Light source 0 ambient light
 		Background_t* bg = engine->GetBackground();
@@ -97,7 +103,7 @@ void Render::Draw()
 		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);		
 	}
 	// Draw spacecraft
-	if(true){
+	{
 		glPushMatrix();
 		// Setting color
 		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -121,7 +127,6 @@ void Render::Draw()
 	}
 	// Draw all objects from engine
 	{
-
 	}
 	glutSwapBuffers();
 }
