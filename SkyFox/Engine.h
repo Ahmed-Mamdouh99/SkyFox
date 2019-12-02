@@ -36,5 +36,6 @@ private:
 	// Private methods
 	void SwitchToThirdPerson();
 	void SwitchToFirstPerson();
+	void SetCameraPosition();
 };
 

@@ -3,6 +3,8 @@
 #define MOVEMENT_STEP 0.1f
 #define BG_STEP 0.005f
 #define MOUSE_SENSE 0.00001f
+#define Z_SPEED -0.01f
+#define BACKGROUND_SIZE 10000.0f
 // Key bindings
 #define KEY_CAMERA_MODE 'c'
 #define KEY_Z_POS 'w'
@@ -16,9 +18,11 @@
 Engine::Engine(float backgroundRadius, float backgroundShininess,
 	float fovy, float zNear, float zFar, int _refreshRate)
 	:background(rng::roll(), rng::roll(),
-		rng::roll(), backgroundRadius, backgroundShininess),
-	camera(fovy, zNear, zFar),
-	refreshRate(_refreshRate)
+		rng::roll(), backgroundRadius, backgroundShininess,
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, false),
+		camera(fovy, zNear, zFar),
+		refreshRate(_refreshRate)
 {
 	// Center the mouse at the start of the game
 	{
@@ -30,6 +34,7 @@ Engine::Engine(float backgroundRadius, float backgroundShininess,
 	spacecraft.center.y = -1.0f;
 	spacecraft.center.x = 0.0f;
 	SwitchToThirdPerson();
+	// Create commets
 }
 
 //==========================================================
@@ -77,23 +82,27 @@ void Engine::HandleKeyboardUp(unsigned char key, int x, int y)
 		exit(EXIT_SUCCESS);
 		break;
 	case KEY_CAMERA_MODE:
-		if (cameraThirdPerson)
-		{
-			SwitchToFirstPerson();
-		}
-		else
-		{
-			SwitchToThirdPerson();
-		}
+		cameraThirdPerson = !cameraThirdPerson;
+		break;
+	default:
+			break;
 	}
 }
 
 void Engine::HandleMouse(int button, int state, int x, int y)
 {
+
 }
 
 void Engine::HandleAnim(int dummy)
 {
+	// Move background and spacecraft
+	background.quad.center.z += Z_SPEED;
+	spacecraft.center.z += Z_SPEED;
+	// Set camera position
+	{
+		SetCameraPosition();
+	}
 	// TODO: Move scene and update env
 	// Update background
 	background.colorRed = cos(background.countRed) / 2.0f + 0.5f;
@@ -124,9 +133,29 @@ SolidQuad* Engine::GetSpacecraft()
 	return &spacecraft;
 }
 
+std::vector<SolidQuad*>* Engine::GetCommets()
+{
+	return &commets;
+}
+
 //==========================================================
 // Camera methods
 //==========================================================
+
+void Engine::SetCameraPosition()
+{
+	if (cameraThirdPerson)
+	{
+		camera.center.z = spacecraft.center.z + spacecraft.size.z * 1.6f;
+		camera.eye.z = camera.center.z + 0.1f;
+	}
+	else
+	{
+		camera.center.z = spacecraft.center.z - spacecraft.size.z * 1.6f;
+		camera.eye.z = camera.center.z + 0.1f;
+	}
+}
+
 void Engine::SwitchToThirdPerson()
 {
 	camera.eye.x = camera.center.x = spacecraft.center.x;
@@ -143,9 +172,4 @@ void Engine::SwitchToFirstPerson()
 	camera.center.z = spacecraft.center.z - spacecraft.size.z * 1.6f;
 	camera.eye.z = camera.center.z + 0.1f;
 	cameraThirdPerson = false;
-}
-
-std::vector<SolidQuad*>* Engine::GetCommets()
-{
-	return &commets;
 }
