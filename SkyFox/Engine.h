@@ -23,8 +23,9 @@ public:
 	Background_t* GetBackground();
 	Camera_t* GetCamera();
 	SolidQuad* GetSpacecraft();
+	std::vector<SolidQuad*>* GetCommets();
 private:
-	std::vector<SolidQuad> commets;
+	std::vector<SolidQuad*> commets;
 	SolidQuad spacecraft;
 	// State management variables and flags
 	bool cameraThirdPerson;

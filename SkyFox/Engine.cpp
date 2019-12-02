@@ -1,7 +1,7 @@
 #include "Engine.h"
 #define MOVE_ANGLE 90.0f
 #define MOVEMENT_STEP 0.1f
-#define BG_STEP 0.002f
+#define BG_STEP 0.005f
 #define MOUSE_SENSE 0.00001f
 // Key bindings
 #define KEY_CAMERA_MODE 'c'
@@ -98,7 +98,7 @@ void Engine::HandleAnim(int dummy)
 	// Update background
 	background.colorRed = cos(background.countRed) / 2.0f + 0.5f;
 	background.colorGreen = sin(background.countGreen) / 2.0f + 0.5f;
-	background.colorBlue = cos(background.countBlue) / 2.0f + 0.5f;
+	background.colorBlue = sin(background.countBlue) / 2.0f + 0.5f;
 	background.countRed += BG_STEP;
 	background.countGreen += BG_STEP;
 	background.countBlue += BG_STEP;
@@ -143,4 +143,9 @@ void Engine::SwitchToFirstPerson()
 	camera.center.z = spacecraft.center.z - spacecraft.size.z * 1.6f;
 	camera.eye.z = camera.center.z + 0.1f;
 	cameraThirdPerson = false;
+}
+
+std::vector<SolidQuad*>* Engine::GetCommets()
+{
+	return &commets;
 }

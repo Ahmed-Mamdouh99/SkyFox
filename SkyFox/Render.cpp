@@ -42,7 +42,7 @@ void Render::Draw()
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	// Draw background
-	if(true){
+	{
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			Background_t* bg = engine->GetBackground();
@@ -79,7 +79,7 @@ void Render::Draw()
 		}
 	}
 	// Set lights
-	if(true){
+	{
 		glEnable(GL_LIGHT0);
 		// Define Light source 0 ambient light
 		Background_t* bg = engine->GetBackground();
@@ -97,7 +97,7 @@ void Render::Draw()
 		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);		
 	}
 	// Draw spacecraft
-	if(true){
+	{
 		glPushMatrix();
 		// Setting color
 		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
