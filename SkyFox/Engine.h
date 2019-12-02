@@ -24,6 +24,13 @@ public:
 	Camera_t* GetCamera();
 	SolidQuad* GetSpacecraft();
 	std::vector<SolidQuad*>* GetCommets();
+	bool isRotating=false;
+	bool keyBoardControl=true;
+	bool goingLeft = false;
+	bool goingRight = false;
+	bool goingUp = false;
+	bool goingDown = false;
+
 private:
 	std::vector<SolidQuad*> commets;
 	SolidQuad spacecraft;
@@ -37,5 +44,7 @@ private:
 	void SwitchToThirdPerson();
 	void SwitchToFirstPerson();
 	void SetCameraPosition();
+	void ReturnToNorm();
+	void MoveCraft();
 };
 
