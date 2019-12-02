@@ -3,7 +3,8 @@
 #define MOVEMENT_STEP 0.1f
 #define BG_STEP 0.005f
 #define MOUSE_SENSE 0.00001f
-#define Z_SPEED -0.01f
+//#define Z_SPEED -0.01f
+#define Z_SPEED 0.0f
 #define BACKGROUND_SIZE 10000.0f
 // Key bindings
 #define KEY_CAMERA_MODE 'c'
