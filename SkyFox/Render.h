@@ -3,6 +3,7 @@
 #include "rng.h"
 #include "Engine.h"
 #include "Model_3DS.h"
+#include <iostream>
 #include <glut.h>
 
 class Render

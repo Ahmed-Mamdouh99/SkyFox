@@ -29,6 +29,9 @@ private:
 	SolidQuad spacecraft;
 	// State management variables and flags
 	bool cameraThirdPerson;
+	int level;
+	int stage;
+	int score;
 	// Environment variables
 	Camera_t camera;
 	Background_t background;
@@ -37,5 +40,7 @@ private:
 	void SwitchToThirdPerson();
 	void SwitchToFirstPerson();
 	void SetCameraPosition();
+	void CreateCommets();
+	void MoveCommets();
 };
 

@@ -103,7 +103,7 @@ void Render::Draw()
 		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);		
 	}
 	// Draw spacecraft
-	{
+	if(false){
 		glPushMatrix();
 		// Setting color
 		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -127,6 +127,30 @@ void Render::Draw()
 	}
 	// Draw all objects from engine
 	{
+		// Setting color
+		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float shininess[1] = { 70.0f };
+		float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+
+		std::vector<SolidQuad*>* commets = engine->GetCommets();
+		SolidQuad* quad;
+		for (int i = 0; i < commets->size(); ++i)
+		{
+			quad = (*commets)[i];
+			glPushMatrix();
+			glTranslatef(quad->center.x, quad->center.y, quad->center.z);
+			glScalef(quad->size.x, quad->size.y, quad->size.z);
+			glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
+			glRotatef(quad->rotation.y, 0.0f, 1.0f, 0.0f);
+			glRotatef(quad->rotation.z, 0.0f, 0.0f, 1.0f);
+			glutSolidCube(1);
+			glPopMatrix();
+		}
 	}
 	glutSwapBuffers();
 }

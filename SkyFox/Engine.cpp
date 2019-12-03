@@ -3,8 +3,9 @@
 #define MOVEMENT_STEP 0.1f
 #define BG_STEP 0.005f
 #define MOUSE_SENSE 0.00001f
-#define Z_SPEED -0.01f
+#define Z_SPEED 0.05f
 #define BACKGROUND_SIZE 10000.0f
+#define NUMBER_OF_COMMETS 100
 // Key bindings
 #define KEY_CAMERA_MODE 'c'
 #define KEY_Z_POS 'w'
@@ -35,6 +36,7 @@ Engine::Engine(float backgroundRadius, float backgroundShininess,
 	spacecraft.center.x = 0.0f;
 	SwitchToThirdPerson();
 	// Create commets
+	CreateCommets();
 }
 
 //==========================================================
@@ -96,9 +98,11 @@ void Engine::HandleMouse(int button, int state, int x, int y)
 
 void Engine::HandleAnim(int dummy)
 {
+	// Move commets
+	MoveCommets();
 	// Move background and spacecraft
-	background.quad.center.z += Z_SPEED;
-	spacecraft.center.z += Z_SPEED;
+	//background.quad.center.z += Z_SPEED;
+	//spacecraft.center.z += Z_SPEED;
 	// Set camera position
 	{
 		SetCameraPosition();
@@ -172,4 +176,41 @@ void Engine::SwitchToFirstPerson()
 	camera.center.z = spacecraft.center.z - spacecraft.size.z * 1.6f;
 	camera.eye.z = camera.center.z + 0.1f;
 	cameraThirdPerson = false;
+}
+
+//==========================================================
+// Physicks
+void Engine::CreateCommets()
+{
+	// Allocate space for commets
+	commets.reserve(NUMBER_OF_COMMETS);
+	const float plane_range = 1.0f;
+	const float min_size = plane_range / 5.0f;
+	const float max_size = plane_range / 3.0f;
+	const float min_depth = -1.0f;
+	const float max_depth = -1000.0f;
+	float side;
+	SolidQuad* quad;
+	for (int i = 0; i < NUMBER_OF_COMMETS; ++i)
+	{
+		side = rng::roll(min_size, max_size);
+		// Create commet
+		quad = new SolidQuad(
+			rng::roll(min_size, max_size), rng::roll(min_size, max_size), rng::roll(min_size, max_size),
+			rng::roll(-plane_range, plane_range), rng::roll(-plane_range, plane_range), rng::roll(min_depth, max_depth)
+		);
+		quad->rotation.x = rng::roll(0, 360);
+		quad->rotation.y = rng::roll(0, 360);
+		quad->rotation.z = rng::roll(0, 360);
+		// Push quad into vector
+		commets.push_back(quad);
+	}
+}
+
+void Engine::MoveCommets()
+{
+	for (int i = 0; i < commets.size(); ++i)
+	{
+		commets[i]->center.z += Z_SPEED;
+	}
 }
