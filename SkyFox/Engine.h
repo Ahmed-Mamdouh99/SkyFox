@@ -31,12 +31,12 @@ private:
 	std::vector<MovingQuad*> commets;
 	SolidQuad spacecraft;
 	// State management variables and flags
-	bool cameraThirdPerson;
-	int level = 0;
+	bool cameraThirdPerson = true;
+	int level = 1;
 	int scene = 0;
 	int score = 0;
 	bool isRotating = false;
-	bool keyBoardControl = true;
+	bool keyBoardControl = false;
 	bool goingLeft = false;
 	bool goingRight = false;
 	bool goingUp = false;
@@ -47,8 +47,6 @@ private:
 	Background_t background;
 	int refreshRate;
 	// Private methods
-	void SwitchToThirdPerson();
-	void SwitchToFirstPerson();
 	void SetCameraPosition();
 	void MoveCamera();
 	void CreateCommets();

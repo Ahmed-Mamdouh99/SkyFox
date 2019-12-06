@@ -46,11 +46,11 @@ void Render::RenderLights() {
 		// Define Light source 0 ambient light
 		Background_t* bg = engine->GetBackground();
 		Camera_t* cam = engine->GetCamera();
-		GLfloat ambient[] = { 0.1f, 0.1f, 0.1, 1.0f };
+		float ambient[4] = { 1.0f , 1.0f, 1.0f, 1.0f };
 		// Define Light source 0 diffuse light
-		GLfloat diffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+		float diffuse[4] = { 0.5f , 0.5f, 0.5f, 0.5f };
 		// Define Light source 0 Specular light
-		GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float specular[4] = { 0.1f, 0.1f, 0.1f, 0.1f };
 		// Finally, define light source 0 position in World Space
 		GLfloat lightPosition[] = { cam->eye.x, cam->eye.y + 1000, cam->eye.z + 1000, 1.0f };
 		glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
@@ -71,12 +71,12 @@ void Render::RenderBackground() {
 		glRotatef(bg->quad.rotation.z, 0.0f, 0.0f, 1.0f);
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			//glPushMatrix();
+			glPushMatrix();
 			// Set solid colors
-			float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
-			float diffuse[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
-			float shininess[1] = { bg->shininess };
-			float specular[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
+			float ambient[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.1f };
+			float diffuse[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.01f };
+			float shininess[1] = { 0.0f };
+			float specular[4] = { 1 - bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
@@ -89,16 +89,16 @@ void Render::RenderBackground() {
 		{
 			glPushMatrix();
 			// Set solid colors
-			float ambient[4] = { 1 - bg->colorRed, 1 - bg->colorGreen, 1 - bg->colorBlue, 1.0f };
-			float diffuse[4] = { 1 - bg->colorRed, 1 - bg->colorGreen, 1 - bg->colorBlue, 1.0f };
+			float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
+			float diffuse[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
 			float shininess[1] = { bg->shininess };
-			float specular[4] = { 1 - bg->colorRed, 1 - bg->colorGreen, 1 - bg->colorBlue, 1.0f };
+			float specular[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
 			// Draw background
-			glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES); // TODO: Set default slices
+			glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
 			glPopMatrix();
 		}
 		glPopMatrix();

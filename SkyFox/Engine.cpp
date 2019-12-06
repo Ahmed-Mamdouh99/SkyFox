@@ -2,28 +2,35 @@
 #define MOVE_ANGLE 90.0f
 #define MOVEMENT_STEP 0.1f
 #define BG_STEP 0.005f
-#define MOUSE_SENSE 0.005f
+#define MOUSE_SENSE 0.0005f
 #define Z_SPEED -0.01f
 #define BACKGROUND_SIZE 10000.0f
-#define NUMBER_OF_COMMETS 20
+#define NUMBER_OF_COMMETS 50
+// Animation values
+#define SCREEN_RANGE 4.0f
 // Commet values
 #define MIN_SIZE 0.1f
 #define MAX_SIZE 0.3f
-#define PLANE_RANGE 1.0f
+#define PLANE_RANGE SCREEN_RANGE
 #define MIN_DEPTH -10.0f
 #define MAX_DEPTH -100.0f
 #define MIN_SPEED MAX_DEPTH / 2500.0f
 #define MAX_SPEED MIN_SPEED * 2.0f
-#define HOMING_FACTOR 0.2f
-// Animation values
-#define SCREEN_RANGE 1.0f
+#define HOMING_FACTOR 0.05f
+// Camera values
+#define ROTATION_FACTOR 50.0f
+#define ANTI_ROTATION_FACTOR 0.01
+#define MAX_ROT_X 45.0f
+#define MAX_ROT_Y 20.0f
 // Key bindings
 #define KEY_CAMERA_MODE 'c'
-#define KEY_Y_POS 's'
-#define KEY_Y_NEG 'w'
+#define KEY_Y_POS 'w'
+#define KEY_Y_NEG 's'
 #define KEY_X_POS 'd'
 #define KEY_X_NEG 'a'
 #define KEY_CONTROL_MODE 'p'
+// Function
+#define WITHIN(x, low, high) (std::min(high, std::max(low, x)))
 
 
 Engine::Engine(float backgroundRadius, float backgroundShininess,
@@ -33,7 +40,8 @@ Engine::Engine(float backgroundRadius, float backgroundShininess,
 		1.0f, 1.0f, 1.0f,
 		0.0f, 0.0f, 0.0f, false),
 	camera(fovy, zNear, zFar),
-	refreshRate(_refreshRate)
+	refreshRate(_refreshRate),
+	cameraThirdPerson(true)
 {
 	// Center the mouse at the start of the game
 	{
@@ -45,7 +53,6 @@ Engine::Engine(float backgroundRadius, float backgroundShininess,
 	spacecraft.center.z = 0.0f;
 	spacecraft.center.y = 0.0f;
 	spacecraft.center.x = 0.0f;
-	SwitchToThirdPerson();
 
 	// Create commets
 	CreateCommets();
@@ -67,98 +74,37 @@ void Engine::HandleReshape(int new_width, int new_height)
 
 void Engine::HandlePassiveMotion(int x, int y)
 {
-	y = glutGet(GLUT_WINDOW_HEIGHT) - y;
 	// Calculating the center position of the screen
 	int center_x = glutGet(GLUT_SCREEN_WIDTH) / 2;
 	int center_y = glutGet(GLUT_SCREEN_HEIGHT) / 2;
 	// Resetting mouse to center
-	//glutWarpPointer(center_x, center_y);
-
+	glutWarpPointer(center_x, center_y);
 	// Move spacecraft with mouse
-
-
-	if (!keyBoardControl)
+	if (!(keyBoardControl || gameOver))
 	{
-		if (cameraThirdPerson)
+		// Set position
+		float delta_x = (x - center_x) * MOUSE_SENSE;
+		float delta_y = (center_y - y) * MOUSE_SENSE;
+		spacecraft.center.x = WITHIN(spacecraft.center.x + delta_x, -SCREEN_RANGE, SCREEN_RANGE);
+		spacecraft.center.y = WITHIN(spacecraft.center.y + delta_y, -SCREEN_RANGE, SCREEN_RANGE);
+		// Set rotation
+		if (x == center_x)
 		{
-			if (x > center_x)
-			{
-				spacecraft.center.x = std::min((x - center_x) * MOUSE_SENSE, 5.0f);
-				spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0, -60.0);
-
-			}
-			else if (x < center_x)
-			{
-				spacecraft.center.x = std::max((x - center_x) * MOUSE_SENSE, -5.0f);
-				spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0, 60.0);
-			}
-			else
-			{
-				spacecraft.center.x = 0;
-				spacecraft.rotation.z = 0;
-			}
-
-			if (y > center_y)
-			{
-				spacecraft.center.y = std::min((y - center_y) * MOUSE_SENSE, 5.0f);
-				spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0, 20.0);
-			}
-			else if (y < center_y)
-			{
-				spacecraft.center.y = std::max(((y - center_y)) * MOUSE_SENSE, -5.0f);
-				spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0, -20.0);
-			}
-			else
-			{
-				spacecraft.center.y = 0;
-				spacecraft.rotation.x = 0;
-			}
+			spacecraft.rotation.z += -spacecraft.rotation.z * ANTI_ROTATION_FACTOR;
 		}
 		else
 		{
-			camera.center.x = std::min((x - center_x) * MOUSE_SENSE, 2.0f);
-			camera.eye.x = camera.center.x;
-			camera.center.y = std::min((y - center_y) * MOUSE_SENSE, 2.0f);
-			camera.eye.y = camera.center.y;
+			spacecraft.rotation.z = WITHIN(spacecraft.rotation.z - delta_x * ROTATION_FACTOR, -MAX_ROT_X, MAX_ROT_X);
 		}
-	}
 
-	// Move spacecraft with mouse
-	if (!keyBoardControl)
-	{
-		if (x > center_x)
+		if (y == center_y)
 		{
-			spacecraft.center.x = std::min((x - center_x) * MOUSE_SENSE, 5.0f);
-			spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0, -60.0);
-		}
-		else if (x < center_x)
-		{
-			spacecraft.center.x = std::max((x - center_x) * MOUSE_SENSE, -5.0f);
-			spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0, 60.0);
+			spacecraft.rotation.x += -spacecraft.rotation.x * ANTI_ROTATION_FACTOR;
 		}
 		else
 		{
-			spacecraft.center.x = 0;
-			spacecraft.rotation.z = 0;
+			spacecraft.rotation.x = WITHIN(spacecraft.rotation.x + delta_y * ROTATION_FACTOR, -MAX_ROT_Y, MAX_ROT_Y);
 		}
-
-		if (y > center_y)
-		{
-			spacecraft.center.y = std::min((y - center_y) * MOUSE_SENSE, 5.0f);
-			spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0, 20.0);
-
-		}
-		else if (y < center_y)
-		{
-			spacecraft.center.y = std::max(((y - center_y)) * MOUSE_SENSE, -5.0f);
-			spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0, -20.0);
-		}
-		else
-		{
-			spacecraft.center.y = 0;
-			spacecraft.rotation.x = 0;
-		}
-
 	}
 }
 
@@ -301,9 +247,9 @@ void Engine::HandleAnim(int dummy)
 			SetCameraPosition();
 		}
 		// Update background
-		background.colorRed = cos(background.countRed) / 2.0f + 0.5f;
-		background.colorGreen = sin(background.countGreen) / 2.0f + 0.5f;
-		background.colorBlue = sin(background.countBlue) / 2.0f + 0.5f;
+		background.colorRed = (cos(background.countRed) + 1.0f) / 4.0f;
+		background.colorGreen = (sin(background.countGreen) + 1.0f) / 4.0f;
+		background.colorBlue = (sin(background.countBlue) + 1.0f) / 4.0f;
 		background.countRed += BG_STEP;
 		background.countGreen += BG_STEP;
 		background.countBlue += BG_STEP;
@@ -364,32 +310,18 @@ void Engine::SetCameraPosition()
 {
 	if (cameraThirdPerson)
 	{
-		camera.center.z = spacecraft.center.z + spacecraft.size.z * 2.0f;
+		camera.eye.x = camera.center.x = spacecraft.center.x;
+		camera.eye.y = camera.center.y = spacecraft.center.y + 1.0f;
+		camera.center.z = spacecraft.center.z + spacecraft.size.z * 5.0f;
 		camera.eye.z = camera.center.z + 0.1f;
 	}
 	else
 	{
-		camera.center.z = spacecraft.center.z - spacecraft.size.z * 2.0f;
+		camera.eye.x = camera.center.x = spacecraft.center.x;
+		camera.eye.y = camera.center.y = spacecraft.center.y;
+		camera.center.z = spacecraft.center.z - spacecraft.size.z * 3.0f;
 		camera.eye.z = camera.center.z + 0.1f;
 	}
-}
-
-void Engine::SwitchToThirdPerson()
-{
-	camera.eye.x = camera.center.x = spacecraft.center.x;
-	camera.eye.y = camera.center.y = spacecraft.center.y + spacecraft.size.y;
-	camera.center.z = spacecraft.center.z + spacecraft.size.z * 2.0f;
-	camera.eye.z = camera.center.z + 0.1f;
-	cameraThirdPerson = true;
-}
-
-void Engine::SwitchToFirstPerson()
-{
-	camera.eye.x = camera.center.x = spacecraft.center.x;
-	camera.eye.y = camera.center.y = spacecraft.center.y;
-	camera.center.z = spacecraft.center.z - spacecraft.size.z * 2.0f;
-	camera.eye.z = camera.center.z + 0.1f;
-	cameraThirdPerson = false;
 }
 
 //==========================================================
