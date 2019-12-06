@@ -40,7 +40,6 @@ struct Background_t
 		radius(_radius),
 		shininess(_shininess),
 		quad(size_x, size_y, size_z,
-			center_x, center_y, center_z,
-			center_is_hind)
+			center_x, center_y, center_z)
 	{}
 };

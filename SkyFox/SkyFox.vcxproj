@@ -79,6 +79,7 @@
     <ClCompile Include="include\GLTexture.cpp" />
     <ClCompile Include="include\Model_3DS.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MovingQuad.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="SolidQuad.cpp" />
   </ItemGroup>
@@ -89,6 +90,7 @@
     <ClInclude Include="include\GLTexture.h" />
     <ClInclude Include="include\glut.h" />
     <ClInclude Include="include\Model_3DS.h" />
+    <ClInclude Include="MovingQuad.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rng.h" />

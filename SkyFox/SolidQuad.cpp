@@ -1,36 +1,20 @@
 #include "SolidQuad.h"
-#include <math.h>
 
-SolidQuad::SolidQuad(float size_x, float size_y, float size_z,
-	float center_x, float center_y, float center_z, bool center_is_hind) :
-	size(size_x, size_y, size_z)
-{
-	// Set solid centers
-	if (center_is_hind)
-	{
-		center_hind.x = center_x;
-		center_hind.y = center_y;
-		center_hind.z = center_z;
-		center.x = center_x + size.x / 2;
-		center.y = center_y + size.y / 2;
-		center.z = center_z + size.z / 2;
-	}
-	else
-	{
-		center.x = center_x;
-		center.y = center_y;
-		center.z = center_z;
-		center_hind.x = center_x - size.x / 2;
-		center_hind.y = center_y - size.y / 2;
-		center_hind.z = center_z - size.z / 2;
-	}
-};
+SolidQuad::SolidQuad(float sizeX, float sizeY, float sizeZ,
+	float centerX, float centerY, float centerZ,
+	float rotationX, float rotationY, float rotationZ) :
+	size(sizeX, sizeY, sizeZ),
+	center(centerX, centerY, centerZ),
+	rotation(rotationX, rotationY, rotationZ)
+{};
 
 // Test collision with another quad
 bool SolidQuad::intersect(SolidQuad* quad2)
 {
 	// Using AABB (Axis Aligned Bounding Box) check
-	return (fabsf(center.x - quad2->center.x) < (size.x + quad2->size.x) &&
-		fabsf(center.y - quad2->center.y) < (size.y + quad2->size.y) &&
-		fabsf(center.z - quad2->center.z) < (size.z + quad2->size.z));
+	float rad = std::min(pow(size.x, 2)+ pow(size.y, 2) + pow(size.y, 2),
+		pow(quad2->size.x, 2) + pow(quad2->size.y, 2) + pow(quad2->size.y, 2));
+	float delta = pow(center.x - quad2->center.x, 2) + pow(center.y - quad2->center.y, 2)
+		+ pow(center.z - quad2->center.z, 2);
+	return delta <= rad;
 }
