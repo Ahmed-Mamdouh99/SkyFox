@@ -35,6 +35,7 @@ Engine::Engine(float backgroundRadius, float backgroundShininess,
 	spacecraft.center.y = 0.0f;
 	spacecraft.center.x = 0.0f;
 	SwitchToThirdPerson();
+
 	// Create commets
 }
 
@@ -64,44 +65,54 @@ void Engine::HandlePassiveMotion(int x, int y)
 	//glutWarpPointer(center_x, center_y);
 
 	// Move spacecraft with mouse
+
+	
 	if (!keyBoardControl)
 	{
-		if (x > center_x)
+		if(cameraThirdPerson)
 		{
-			spacecraft.center.x = std::min((x-center_x) * MOUSE_SENSE, 5.0f);
-			spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0, -60.0);
-		}
-		else if (x<center_x)
-		{
-			spacecraft.center.x = std::max((x-center_x) * MOUSE_SENSE, -5.0f);
-			spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0, 60.0);
+			if (x > center_x)
+			{
+				spacecraft.center.x = std::min((x - center_x) * MOUSE_SENSE, 5.0f);
+				spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0, -60.0);
+				
+			}
+			else if (x < center_x)
+			{
+				spacecraft.center.x = std::max((x - center_x) * MOUSE_SENSE, -5.0f);
+				spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0, 60.0);	
+			}
+			else
+			{
+				spacecraft.center.x = 0;
+				spacecraft.rotation.z = 0;
+			}
+
+			if (y > center_y)
+			{
+				spacecraft.center.y = std::min((y - center_y) * MOUSE_SENSE, 5.0f);
+				spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0, 20.0);
+			}
+			else if (y < center_y)
+			{
+				spacecraft.center.y = std::max(((y - center_y)) * MOUSE_SENSE, -5.0f);
+				spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0, -20.0);
+			}
+			else
+			{
+				spacecraft.center.y = 0;
+				spacecraft.rotation.x = 0;
+			}
 		}
 		else
 		{
-			spacecraft.center.x = 0;
-			spacecraft.rotation.z = 0;
+			camera.center.x = std::min((x - center_x) * MOUSE_SENSE, 2.0f);
+			camera.eye.x = camera.center.x;
+			camera.center.y = std::min((y - center_y) * MOUSE_SENSE, 2.0f);
+			camera.eye.y = camera.center.y;
 		}
-
-		if (y > center_y)
-		{
-			spacecraft.center.y = std::min((y - center_y) * MOUSE_SENSE, 5.0f);
-			spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0, 20.0);
-
-		}
-		else if(y<center_y)
-		{
-			spacecraft.center.y = std::max(((y - center_y)) * MOUSE_SENSE, -5.0f);
-			spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0, -20.0);
-		}
-		else
-		{
-			spacecraft.center.y = 0;
-			spacecraft.rotation.x = 0;
-		}
-
 	}
-	//camera.eye.x = std::max(std::min(camera.center.x + 5.0f, camera.eye.x + (center_x - x) * MOUSE_SENSE), camera.center.x - 5.0f);
-	//camera.eye.y = std::max(std::min(camera.center.y + 5.0f, camera.eye.y - (center_y - y) * MOUSE_SENSE), camera.center.y - 5.0f);
+	
 }
 
 void Engine::HandleMotion(int x, int y)
@@ -139,6 +150,7 @@ void Engine::HandleKeyboardUp(unsigned char key, int x, int y)
 			break;
 		case KEY_CAMERA_MODE:
 			cameraThirdPerson = !cameraThirdPerson;
+			isRotating = false;
 			break;
 		case KEY_X_POS:
 			goingRight = false;
@@ -217,6 +229,30 @@ void Engine::MoveCraft()
 	}
 }
 
+void Engine::MoveCamera()
+{
+	if (goingRight)
+	{
+		camera.center.x = std::min(camera.center.x + 0.1f, 2.0f);
+		camera.eye.x = camera.center.x;
+	}
+	if (goingLeft)
+	{
+		camera.center.x = std::max(camera.center.x - 0.1f, -2.0f);
+		camera.eye.x = camera.center.x;
+	}
+	if (goingDown)
+	{
+		camera.center.y = std::max(camera.center.y - 0.1f, -2.0f);
+		camera.eye.y = camera.center.y;
+	}
+	if (goingUp)
+	{
+		camera.center.y = std::min(camera.center.y + 0.1f , 2.0f);
+		camera.eye.y = camera.center.y;
+	}
+}
+
 void Engine::HandleAnim(int dummy)
 {
 	// Move background and spacecraft
@@ -240,10 +276,15 @@ void Engine::HandleAnim(int dummy)
 	{
 		ReturnToNorm();
 	}
-	else if (keyBoardControl)
+	else if (keyBoardControl && cameraThirdPerson)
 	{
 		MoveCraft();
 	}
+	else if (!cameraThirdPerson && keyBoardControl)
+	{
+		MoveCamera();
+	}
+
 	isRotating = goingDown || goingUp || goingLeft || goingRight;
 	// Redraw scene
 	glutPostRedisplay();

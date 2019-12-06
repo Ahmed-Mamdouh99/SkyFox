@@ -46,5 +46,6 @@ private:
 	void SetCameraPosition();
 	void ReturnToNorm();
 	void MoveCraft();
+	void MoveCamera();
 };
 
