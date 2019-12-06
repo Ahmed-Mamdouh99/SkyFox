@@ -3,6 +3,8 @@
 #include "rng.h"
 #include "Engine.h"
 #include "Model_3DS.h"
+#include "MovingQuad.h"
+#include <iostream>
 #include <vector>
 #include <glut.h>
 
@@ -16,7 +18,7 @@ public:
 	void RenderBackground();
 private:
 	Engine* engine;
-	Model_3DS spacecraftModel;
+	Model_3DS spacecraftModel1;
 	Model_3DS commetModel1;
 	Model_3DS commetModel2;
 	Model_3DS spacecraftModel2;
