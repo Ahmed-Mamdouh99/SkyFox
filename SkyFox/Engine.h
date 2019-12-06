@@ -32,7 +32,7 @@ private:
 	SolidQuad spacecraft;
 	// State management variables and flags
 	bool cameraThirdPerson = true;
-	int level = 1;
+	int level = 0;
 	int scene = 0;
 	int score = 0;
 	bool isRotating = false;
