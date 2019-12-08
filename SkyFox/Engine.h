@@ -36,7 +36,7 @@ private:
 	int scene = 0;
 	int score = 0;
 	bool isRotating = false;
-	bool keyBoardControl = false;
+	bool keyBoardControl = true;
 	bool goingLeft = false;
 	bool goingRight = false;
 	bool goingUp = false;
@@ -52,7 +52,6 @@ private:
 	void CreateCommets();
 	void RecreateCommets();
 	void MoveCommets();
-	void ReturnToNorm();
 	void MoveCraft();
 	void CheckGameOver();
 };
