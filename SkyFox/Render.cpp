@@ -52,7 +52,7 @@ void Render::RenderLights() {
 		// Define Light source 0 Specular light
 		float specular[4] = { 0.1f, 0.1f, 0.1f, 0.1f };
 		// Finally, define light source 0 position in World Space
-		GLfloat lightPosition[] = { cam->eye.x, cam->eye.y + 1000, cam->eye.z + 1000, 1.0f };
+		GLfloat lightPosition[] = { cam->eye.x, cam->eye.y, cam->eye.z, 1.0f };
 		glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 		glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
@@ -61,50 +61,36 @@ void Render::RenderLights() {
 }
 
 void Render::RenderBackground() {
+	glPushMatrix();
+	glDisable(GL_TEXTURE_2D);
+	Background_t* bg = engine->GetBackground();
+	glTranslatef(bg->quad.center.x, bg->quad.center.y, bg->quad.center.z);
+	glScalef(bg->quad.size.x, bg->quad.size.y, bg->quad.size.z);
+	glRotatef(bg->quad.rotation.x, 1.0f, 0.0f, 0.0f);
+	glRotatef(bg->quad.rotation.y, 0.0f, 1.0f, 0.0f);
+	glRotatef(bg->quad.rotation.z, 0.0f, 0.0f, 1.0f);
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPushMatrix();
+		// Set solid colors
+		float ambient[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.5f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		// Draw background
+		glutSolidSphere(bg->radius, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
+		glPopMatrix();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 	{
 		glPushMatrix();
-		glDisable(GL_TEXTURE_2D);
-		Background_t* bg = engine->GetBackground();
-		glTranslatef(bg->quad.center.x, bg->quad.center.y, bg->quad.center.z);
-		glScalef(bg->quad.size.x, bg->quad.size.y, bg->quad.size.z);
-		glRotatef(bg->quad.rotation.x, 1.0f, 0.0f, 0.0f);
-		glRotatef(bg->quad.rotation.y, 0.0f, 1.0f, 0.0f);
-		glRotatef(bg->quad.rotation.z, 0.0f, 0.0f, 1.0f);
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glPushMatrix();
-			// Set solid colors
-			float ambient[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.1f };
-			float diffuse[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.01f };
-			float shininess[1] = { 0.0f };
-			float specular[4] = { 1 - bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-			// Draw background
-			glutSolidSphere(bg->radius, 100, 100); // TODO: Set default slices
-			glPopMatrix();
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		{
-			glPushMatrix();
-			// Set solid colors
-			float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
-			float diffuse[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
-			float shininess[1] = { bg->shininess };
-			float specular[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.01f };
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-			// Draw background
-			glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
-			glPopMatrix();
-		}
+		// Set solid colors
+		float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.5f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		// Draw background
+		glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
 		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
 	}
+	glPopMatrix();
+	glEnable(GL_TEXTURE_2D);
 }
 
 void Render::Draw()
@@ -135,7 +121,6 @@ void Render::Draw()
 		glTranslatef(quad->center.x, quad->center.y, quad->center.z);
 		glScalef(quad->size.x, quad->size.y, quad->size.z);
 		glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
-		glRotatef(quad->rotation.y, 0.0f, 1.0f, 0.0f);
 		glRotatef(quad->rotation.z, 0.0f, 0.0f, 1.0f);
 #ifdef SHOW_HURT_BOXES
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -167,8 +152,6 @@ void Render::Draw()
 			glTranslatef(quad->center.x, quad->center.y, quad->center.z);
 			glScalef(quad->size.x, quad->size.y, quad->size.z);
 			glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
-			glRotatef(quad->rotation.y, 0.0f, 1.0f, 0.0f);
-			glRotatef(quad->rotation.z, 0.0f, 0.0f, 1.0f);
 #ifdef SHOW_HURT_BOXES
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glutSolidSphere(1, 100, 100);
