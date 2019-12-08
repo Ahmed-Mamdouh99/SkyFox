@@ -63,6 +63,7 @@ void Render::RenderLights() {
 void Render::RenderBackground() {
 	{
 		glPushMatrix();
+		glDisable(GL_TEXTURE_2D);
 		Background_t* bg = engine->GetBackground();
 		glTranslatef(bg->quad.center.x, bg->quad.center.y, bg->quad.center.z);
 		glScalef(bg->quad.size.x, bg->quad.size.y, bg->quad.size.z);
@@ -102,6 +103,7 @@ void Render::RenderBackground() {
 			glPopMatrix();
 		}
 		glPopMatrix();
+		glEnable(GL_TEXTURE_2D);
 	}
 }
 
