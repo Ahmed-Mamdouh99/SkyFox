@@ -43,6 +43,7 @@ Render::Render(Engine* _engine)
 
 	// Set lights
 	RenderLights();
+	RenderHeadLights();
 }
 
 void Render::RenderLights() {
@@ -51,40 +52,42 @@ void Render::RenderLights() {
 	// Define Light source 0 ambient light
 	Background_t* bg = engine->GetBackground();
 	Camera_t* cam = engine->GetCamera();
-	float ambient[4] = { 1.0f , 1.0f, 1.0f, 0.05f };
-	// Define Light source 0 diffuse light
-	float diffuse[4] = { 0.5f , 0.5f, 0.5f, 0.05f };
+	float c = 0.5f;
+	float ambientAndDiffuse[4] = { c, c, c, 1.0f };
 	// Define Light source 0 Specular light
-	float specular[4] = { 0.1f, 0.1f, 0.1f, 0.05f };
+	float specular[4] = { c, c, c, 1.0f };
 	// Finally, define light source 0 position in World Space
-	GLfloat lightPosition[] = { cam->eye.x, cam->eye.y, cam->eye.z, 1.0f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	GLfloat lightPosition[] = { cam->eye.x, cam->eye.y, cam->eye.z, 0.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientAndDiffuse);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientAndDiffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHT1);
-	RenderHeadLights();
 }
 
 void Render::RenderHeadLights() {
 	// set light source 1
 	{
-
+		Background_t* bg = engine->GetBackground();
 		SolidQuad* craft = engine->GetSpacecraft();
 		// Define Light source 1 ambient light
-		float ambient[4] = { 1.0f , 0.0f, 0.0f, 0.5f };
-		// Define Light source 1 diffuse light
-		float diffuse[4] = { 1.0f , 0.0f, 0.0f, 0.5f };
+		//float ambient[4] = { 0.0f , 0.0f, 1.0f, 1.0f };
+		float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 1.0f };
 		// Define Light source 1 Specular light
 		//float specular[4] = { 0.1f, 0.1f, 0.1f, 0.1f };
 		// Finally, define light source 1 position in World Space
-		GLfloat lightPosition[] = { craft->center.x, craft->center.y, craft->center.z - 1, 1.0f };
+		GLfloat lightPosition[] = { craft->center.x, craft->center.y, craft->center.z - 1, 0.0f };
 		glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
-		glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, ambient);
 		//glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
 		glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
+		float cutoff[1] = { 10.0f };
+		float direction[] = {0.0f, 0.0f, -1.0f};
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 10.0f);
+		glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, -1000.0f);
+		glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, direction);
 	}
 }
 
@@ -102,6 +105,9 @@ void Render::RenderBackground() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// Set solid colors
 		float ambient[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.5f };
+		//float ambient[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+		//float diffuse[4] = { 0.5f, 0.0f, 0.5f, 1.0f };
+		//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ambient);
 		// Draw background
 		glutSolidSphere(bg->radius, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
@@ -109,8 +115,11 @@ void Render::RenderBackground() {
 	}
 	{ // Drawing outer circle
 		// Set solid colors
-		float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.5f };
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ambient);
+		//float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.5f };
+		float ambient[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+		float diffuse[4] = { 0.5f, 0.5f, 0.0f, 1.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 		// Draw background
 		glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
 	}
@@ -287,7 +296,7 @@ void Render::Draw()
 	}
 	// Clear scene
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	// Draw scene
 	RenderBackground();
 	if (engine->GetStartLevel() == false || engine->GetGameOver() == true)

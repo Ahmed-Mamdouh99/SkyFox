@@ -1,7 +1,7 @@
 #include "Engine.h"
 #define MOVE_ANGLE 90.0f
 #define MOVEMENT_STEP 0.1f
-#define BG_STEP 0.005f
+#define BG_STEP 0.01f
 #define BG_STEP_ROT 0.01f
 #define MOUSE_SENSE 0.0005f
 #define BACKGROUND_SIZE 10000.0f
@@ -269,9 +269,9 @@ void Engine::MoveCamera()
 void Engine::HandleAnim(int dummy)
 {
 	// Update background
-	background.colorRed = (cos(background.countRed) + 1.0f) / 4.0f;
-	background.colorGreen = (sin(background.countGreen) + 1.0f) / 4.0f;
-	background.colorBlue = (sin(background.countBlue) + 1.0f) / 4.0f;
+	background.colorRed = (cos(background.countRed) + 1.0f) / 2.0f;
+	background.colorGreen = (sin(background.countGreen) + 1.0f) / 2.0f;
+	background.colorBlue = (sin(background.countBlue) + 1.0f) / 2.0f;
 	background.countRed += BG_STEP;
 	background.countGreen += BG_STEP;
 	background.countBlue += BG_STEP;
