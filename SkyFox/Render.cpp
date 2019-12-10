@@ -246,7 +246,8 @@ void Render::RenderCard() {
 		textZ += -0.1;
 	}
 	glTranslatef( cardX, cardY, 0);
-	drawRectangle(1, 1, zcord, true);
+	if(!engine->GetGameOver())
+		drawRectangle(1, 1, zcord, true);
 	glPushMatrix();
 	glTranslatef(0.07, 0.5, zcord + textZ);
 	{
