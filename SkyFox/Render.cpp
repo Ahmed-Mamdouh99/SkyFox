@@ -213,7 +213,7 @@ void drawRectangle(float w, float h, float depth, bool filled) {
 }
 
 void Render::RenderCard() {
-	SolidQuad* quad = engine->GetSpacecraft();
+	SolidQuad* craft = engine->GetSpacecraft();
 	Camera_t* cam = engine->GetCamera();
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -222,13 +222,33 @@ void Render::RenderCard() {
 		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 	}
-	float zcord = engine->GetLevel() == 0 ? 2.5 : -2.5;
+	float zcord = 0;
+	//float zcord = engine->GetLevel() == 0 ? 2.5 : -2.5;
+	//if (engine->GetGameOver()) {
+	//	zcord = -2.5;
+	//}
+
+	float cardX = craft->center.x, cardY = craft->center.y, cardZ = 0, textZ = 0;
 	if (engine->GetGameOver()) 
-		zcord = -2.5;
-	//glutSolidCube(1);
+	{
+		zcord += -1.4;
+		cardX += -0.37;
+		cardY += 0.5;
+		textZ += 0.1;
+	}
+	else if(engine->GetLevel() == 0) {
+		cardY += -0.5;
+		zcord += 2.5;
+		textZ += -0.1;
+	} else if (engine->GetLevel() == 1) {
+		cardY += -0.5;
+		zcord += 2.5f;
+		textZ += -0.1;
+	}
+	glTranslatef( cardX, cardY, 0);
 	drawRectangle(1, 1, zcord, true);
 	glPushMatrix();
-	glTranslatef(0, 0, zcord - 0.6f);
+	glTranslatef(0.07, 0.5, zcord + textZ);
 	{
 		float ambient[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
@@ -236,26 +256,25 @@ void Render::RenderCard() {
 	float x = 0, y = 0;
 	glRasterPos2f(x, y);
 	if (engine->GetGameOver()) {
+		printf("game over");
 		write((char*)"Game Over", true);
 		/*y -= 0.02;
 		glRasterPos2f(x, y);
 		write("", false);*/
 
 	}
-	else if (engine->GetStartLevel() == false) {
-		printf("Start level false");
-		if (engine->GetLevel() == 0) {
+	else if (engine->GetLevel() == 0) {
 			printf("Scene 0");
 			// display new game
 			write((char*)"Start Game", true);
-		}
-		else if (engine->GetLevel() == 1) {
-			printf("Scene 1");
-			// display level 2 starts
-			write((char*)"Start Level 1", true);
-
-		}
 	}
+	else if (engine->GetLevel() == 1) {
+		printf("Scene 1");
+		// display level 2 starts
+		write((char*)"Start Level 1", true);
+
+	}
+	
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
