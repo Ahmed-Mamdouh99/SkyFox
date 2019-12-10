@@ -27,6 +27,9 @@ public:
 	std::vector<MovingQuad*>* GetCommets();
 	int GetLevel();
 	int GetScene();
+	int GetScore();
+	bool GetStartLevel();
+	bool GetGameOver();
 private:
 	std::vector<MovingQuad*> commets;
 	SolidQuad spacecraft;
@@ -41,6 +44,8 @@ private:
 	bool goingRight = false;
 	bool goingUp = false;
 	bool goingDown = false;
+
+	bool startLevel = false;
 	bool gameOver = false;
 	// Environment variables
 	Camera_t camera;
