@@ -4,7 +4,6 @@
 #define BG_STEP 0.005f
 #define BG_STEP_ROT 0.01f
 #define MOUSE_SENSE 0.0005f
-#define Z_SPEED -0.01f
 #define BACKGROUND_SIZE 10000.0f
 #define NUMBER_OF_COMMETS 50
 // Animation values
@@ -123,7 +122,7 @@ void Engine::HandleMotion(int x, int y)
 
 void Engine::HandleKeyboard(unsigned char key, int x, int y)
 {
-	if (startLevel && keyBoardControl) {
+	if (startLevel && keyBoardControl && !gameOver) {
 		switch (key)
 		{
 		case KEY_X_POS:
@@ -145,7 +144,12 @@ void Engine::HandleKeyboard(unsigned char key, int x, int y)
 
 void Engine::HandleKeyboardUp(unsigned char key, int x, int y)
 {
-	if (!startLevel && level < 1) {
+	if (gameOver) {
+		if (key == 27) {
+			exit(EXIT_SUCCESS);
+		}
+
+	} else if (!startLevel) {
 
 		switch (key) {
 		case 27:
@@ -480,6 +484,12 @@ void Engine::CheckGameOver()
 		if (spacecraft.intersect(quad))
 		{
 			gameOver = true;
+			// Reset spacecraft position, movement and rotation
+			spacecraft.center.y = 0.0f;
+			spacecraft.center.x = 0.0f;
+			spacecraft.rotation *= 0.0f;
+			MoveCamera();
+			return;
 		}
 		else if (quad->center.z <= spacecraft.center.z)
 		{
@@ -489,15 +499,26 @@ void Engine::CheckGameOver()
 	if (sceneEnd && level == 1 && scene == 1)
 	{
 		gameOver = true;
+		// Reset spacecraft position, movement and rotation
+		spacecraft.center.y = 0.0f;
+		spacecraft.center.x = 0.0f;
+		spacecraft.rotation *= 0.0f;
+		MoveCamera();
 	}
 	else if (sceneEnd)
 	{
 		if (scene == 1)
 		{
-			level = 1;
+			level++;
+			startLevel = false;
+			// Reset spacecraft position, movement and rotation
+			spacecraft.center.y = 0.0f;
+			spacecraft.center.x = 0.0f;
+			spacecraft.rotation *= 0.0f;
+			MoveCamera();
+
 		}
 		++scene %= 2;
-		startLevel = false;
 		RecreateCommets();
 	}
 }

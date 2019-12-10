@@ -1,7 +1,7 @@
 #include "Render.h"
 #define DEFAULT_SPHERE_SLICES 100
 
-Render::Render(Engine * _engine)
+Render::Render(Engine* _engine)
 	:engine(_engine)
 {
 	// Remove mouse cursor
@@ -23,11 +23,11 @@ Render::Render(Engine * _engine)
 	spacecraftModel1.pos.y += 0.2f;
 
 	spacecraftModel2.Load((char*)"models/spacecraft2/Spaceship N090708.3DS");
-	spacecraftModel2.scale = 0.5f;
+	spacecraftModel2.scale = 0.2f;
 	spacecraftModel2.pos.x = 0;
 	spacecraftModel2.pos.y = 0;
 	spacecraftModel2.pos.z = 0;
-	spacecraftModel2.rot.y = 180;
+	spacecraftModel2.rot.x = 90;
 
 	commetModel2.Load((char*)"models/asteroid1/asteroid1.3ds");
 	commetModel2.scale = 0.09;
@@ -47,35 +47,34 @@ Render::Render(Engine * _engine)
 
 void Render::RenderLights() {
 	// Set light 0
-	{
-		glEnable(GL_LIGHT0);
-		// Define Light source 0 ambient light
-		Background_t* bg = engine->GetBackground();
-		Camera_t* cam = engine->GetCamera();
-		float ambient[4] = { 1.0f , 1.0f, 1.0f, 1.0f };
-		// Define Light source 0 diffuse light
-		float diffuse[4] = { 0.5f , 0.5f, 0.5f, 0.5f };
-		// Define Light source 0 Specular light
-		float specular[4] = { 0.1f, 0.1f, 0.1f, 0.1f };
-		// Finally, define light source 0 position in World Space
-		GLfloat lightPosition[] = { cam->eye.x, cam->eye.y, cam->eye.z, 1.0f };
-		glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
-		glEnable(GL_COLOR_MATERIAL);
-	}
-	Render::RenderHeadLights();
+	glEnable(GL_LIGHT0);
+	// Define Light source 0 ambient light
+	Background_t* bg = engine->GetBackground();
+	Camera_t* cam = engine->GetCamera();
+	float ambient[4] = { 1.0f , 1.0f, 1.0f, 0.05f };
+	// Define Light source 0 diffuse light
+	float diffuse[4] = { 0.5f , 0.5f, 0.5f, 0.05f };
+	// Define Light source 0 Specular light
+	float specular[4] = { 0.1f, 0.1f, 0.1f, 0.05f };
+	// Finally, define light source 0 position in World Space
+	GLfloat lightPosition[] = { cam->eye.x, cam->eye.y, cam->eye.z, 1.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHT1);
+	RenderHeadLights();
 }
 
 void Render::RenderHeadLights() {
 	// set light source 1
 	{
-		glEnable(GL_LIGHT1);
+
 		SolidQuad* craft = engine->GetSpacecraft();
 		// Define Light source 1 ambient light
-		float ambient[4] = { 1.0f , 1.0f, 1.0f, 1.0f };
+		float ambient[4] = { 1.0f , 0.0f, 0.0f, 0.5f };
 		// Define Light source 1 diffuse light
 		float diffuse[4] = { 1.0f , 0.0f, 0.0f, 0.5f };
 		// Define Light source 1 Specular light
@@ -169,7 +168,7 @@ void Render::RenderSpaceCraft()
 	switch (engine->GetLevel())
 	{
 	case 0:
-		spacecraftModel2.Draw();
+		spacecraftModel1.Draw();
 		break;
 	case 1:
 		spacecraftModel2.Draw();
@@ -210,15 +209,17 @@ void Render::RenderCard() {
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
 	// canvas to write on
-	//glTranslatef(0, 0,  0.5 + cam->eye.z);
 	{
 		float ambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 	}
+	float zcord = engine->GetLevel() == 0 ? 2.5 : -2.5;
+	if (engine->GetGameOver()) 
+		zcord = -2.5;
 	//glutSolidCube(1);
-	drawRectangle(1, 1, cam->eye.z + 2.5f, true);
+	drawRectangle(1, 1, zcord, true);
 	glPushMatrix();
-	glTranslatef(0, 0.5, cam->eye.z + 2.5f - 0.6f);
+	glTranslatef(0, 0, zcord - 0.6f);
 	{
 		float ambient[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
@@ -231,13 +232,15 @@ void Render::RenderCard() {
 		glRasterPos2f(x, y);
 		write("", false);*/
 
-	} else if (engine->GetStartLevel() == false) {
+	}
+	else if (engine->GetStartLevel() == false) {
 		printf("Start level false");
-		if (engine->GetScene() == 0) {
+		if (engine->GetLevel() == 0) {
 			printf("Scene 0");
 			// display new game
 			write((char*)"Start Game", true);
-		} else if (engine->GetScene() == 1) {
+		}
+		else if (engine->GetLevel() == 1) {
 			printf("Scene 1");
 			// display level 2 starts
 			write((char*)"Start Level 1", true);
@@ -252,18 +255,22 @@ void Render::RenderCard() {
 
 void Render::RenderScore()
 {
-Camera_t* cam = engine->GetCamera();
+	glDisable(GL_TEXTURE_2D);
+	Camera_t* cam = engine->GetCamera();
+	Background_t* bg = engine->GetBackground();
 	// show score
 	glPushMatrix();
 	float x = 0, y = 0;
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glTranslatef(cam->center.x, cam->center.y + 0.5, cam->center.z + 1.9);
+	float color[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
+	glTranslatef(cam->center.x - 0.1, cam->center.y + 0.8, cam->center.z - 1.9);
 	glRasterPos2f(x, y);
 	write((char*)"Score: ", true);
 	char ibuff[24];
 	sprintf(ibuff, "%d", engine->GetScore());
 	write(ibuff, true);
 	glPopMatrix();
+	glEnable(GL_TEXTURE_2D);
 }
 
 void Render::Draw()
@@ -283,10 +290,9 @@ void Render::Draw()
 
 	// Draw scene
 	RenderBackground();
-	if(engine->getStartLevel() == false || engine->GetGameOver() == true)
+	if (engine->GetStartLevel() == false || engine->GetGameOver() == true)
 	{
 		RenderCard();
-		RenderScore();
 	}
 	else
 	{
@@ -294,6 +300,7 @@ void Render::Draw()
 		RenderHeadLights();
 		RenderComets();
 	}
+	RenderScore();
 	// Swap buffers
 	glutSwapBuffers();
 }
