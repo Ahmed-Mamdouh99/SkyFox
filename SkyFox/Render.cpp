@@ -63,6 +63,8 @@ void Render::RenderLights() {
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 		glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+		glEnable(GL_COLOR_MATERIAL);
 	}
 	Render::RenderHeadLights();
 }
@@ -91,45 +93,43 @@ void Render::RenderBackground() {
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
 	Background_t* bg = engine->GetBackground();
+	SolidQuad* craft = engine->GetSpacecraft();
 	glTranslatef(bg->quad.center.x, bg->quad.center.y, bg->quad.center.z);
 	glScalef(bg->quad.size.x, bg->quad.size.y, bg->quad.size.z);
-	glRotatef(bg->quad.rotation.x, 1.0f, 0.0f, 0.0f);
-	glRotatef(bg->quad.rotation.y, 0.0f, 1.0f, 0.0f);
-	glRotatef(bg->quad.rotation.z, 0.0f, 0.0f, 1.0f);
-	{
+	glRotatef(-craft->rotation.x / 2.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(-craft->rotation.y, 0.0f, 1.0f, 0.0f);
+	glRotatef(-craft->rotation.z, 0.0f, 0.0f, 1.0f);
+	{ // Drawing wire circle
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glPushMatrix();
 		// Set solid colors
 		float ambient[4] = { 0.5f - bg->colorRed, 0.5f - bg->colorGreen, 0.5f - bg->colorBlue, 0.5f };
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ambient);
 		// Draw background
 		glutSolidSphere(bg->radius, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
-		glPopMatrix();
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	{
-		glPushMatrix();
+	{ // Drawing outer circle
 		// Set solid colors
 		float ambient[4] = { bg->colorRed, bg->colorGreen, bg->colorBlue, 0.5f };
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ambient);
 		// Draw background
 		glutSolidSphere(bg->radius * 1.1, DEFAULT_SPHERE_SLICES, DEFAULT_SPHERE_SLICES);
-		glPopMatrix();
 	}
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
 }
 
-void Render::RenderSpaceCraft() {
+void Render::RenderComets()
+{
+	std::vector<MovingQuad*>* commets = engine->GetCommets();
+	MovingQuad* quad;
+	for (int i = 0; i < commets->size(); ++i)
 	{
+		quad = (*commets)[i];
 		glPushMatrix();
-		// Getting the physical data fromm engine
-		SolidQuad* quad = engine->GetSpacecraft();
-		// Drawing spacecraft
 		glTranslatef(quad->center.x, quad->center.y, quad->center.z);
 		glScalef(quad->size.x, quad->size.y, quad->size.z);
 		glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
-		glRotatef(quad->rotation.z, 0.0f, 0.0f, 1.0f);
 #ifdef SHOW_HURT_BOXES
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glutSolidSphere(1, 100, 100);
@@ -138,48 +138,44 @@ void Render::RenderSpaceCraft() {
 		switch (engine->GetScene())
 		{
 		case 0:
-			spacecraftModel1.Draw();
+			commetModel1.Draw();
 			break;
 		case 1:
-			spacecraftModel2.Draw();
+			commetModel2.Draw();
 			break;
 		default:
 			break;
 		}
 		glPopMatrix();
 	}
-
 }
 
-void Render::RenderComets() {
-	{
-		std::vector<MovingQuad*>* commets = engine->GetCommets();
-		MovingQuad* quad;
-		for (int i = 0; i < commets->size(); ++i)
-		{
-			quad = (*commets)[i];
-			glPushMatrix();
-			glTranslatef(quad->center.x, quad->center.y, quad->center.z);
-			glScalef(quad->size.x, quad->size.y, quad->size.z);
-			glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
+
+void Render::RenderSpaceCraft()
+{
+	glPushMatrix();
+	// Getting the physical data fromm engine
+	SolidQuad* quad = engine->GetSpacecraft();
+	// Drawing spacecraft
+	glTranslatef(quad->center.x, quad->center.y, quad->center.z);
+	glScalef(quad->size.x, quad->size.y, quad->size.z);
+	glRotatef(quad->rotation.x, 1.0f, 0.0f, 0.0f);
+	glRotatef(quad->rotation.z, 0.0f, 0.0f, 1.0f);
 #ifdef SHOW_HURT_BOXES
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glutSolidSphere(1, 100, 100);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glutSolidSphere(1, 100, 100);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
-			switch (engine->GetScene())
-			{
-			case 0:
-				commetModel1.Draw();
-				break;
-			case 1:
-				commetModel2.Draw();
-				break;
-			default:
-				break;
-			}
-			glPopMatrix();
-		}
+	switch (engine->GetLevel())
+	{
+	case 0:
+		spacecraftModel2.Draw();
+		break;
+	case 1:
+		spacecraftModel2.Draw();
+		break;
+	default:
+		break;
 	}
 }
 
@@ -254,6 +250,22 @@ void Render::RenderCard() {
 
 }
 
+void Render::RenderScore()
+{
+Camera_t* cam = engine->GetCamera();
+	// show score
+	glPushMatrix();
+	float x = 0, y = 0;
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glTranslatef(cam->center.x, cam->center.y + 0.5, cam->center.z + 1.9);
+	glRasterPos2f(x, y);
+	write((char*)"Score: ", true);
+	char ibuff[24];
+	sprintf(ibuff, "%d", engine->GetScore());
+	write(ibuff, true);
+	glPopMatrix();
+}
+
 void Render::Draw()
 {
 	glMatrixMode(GL_MODELVIEW);
@@ -268,39 +280,20 @@ void Render::Draw()
 	}
 	// Clear scene
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
-	glEnable(GL_COLOR_MATERIAL);
-	glPushMatrix();
-	// Draw background
+
+	// Draw scene
 	RenderBackground();
-	// Draw spacecraft
+	if(engine->getStartLevel() == false || engine->GetGameOver() == true)
+	{
+		RenderCard();
+		RenderScore();
+	}
+	else
 	{
 		RenderSpaceCraft();
 		RenderHeadLights();
-	} 
-	
-	SolidQuad* craft = engine->GetSpacecraft();
-	Camera_t* cam = engine->GetCamera();
-	// show score
-	glPushMatrix();
-	float x = 0, y = 0;
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glTranslatef(cam->center.x, cam->center.y + 0.5, cam->center.z + 1.9);
-	glRasterPos2f(x, y);
-	write((char*)"Score: ", true);
-	char ibuff[24];
-	sprintf(ibuff, "%d", engine->GetScore());
-	write(ibuff, true);
-	glPopMatrix();
-
-	if (engine->GetStartLevel() == false || engine->GetGameOver() == true) {
-		printf("Here \n");
-		RenderCard();
-	}
-	else {
-		// Draw all objects from engine
 		RenderComets();
 	}
-	glPopMatrix();
+	// Swap buffers
 	glutSwapBuffers();
 }

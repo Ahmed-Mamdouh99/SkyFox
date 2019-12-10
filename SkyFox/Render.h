@@ -14,13 +14,14 @@ class Render
 public:
 	Render(Engine* engine);
 	void Draw();
+private:
 	void RenderLights();
 	void RenderBackground();
 	void RenderSpaceCraft();
 	void RenderComets();
 	void RenderCard();
 	void RenderHeadLights();
-private:
+	void RenderScore();
 	Engine* engine;
 	Model_3DS spacecraftModel1;
 	Model_3DS commetModel1;

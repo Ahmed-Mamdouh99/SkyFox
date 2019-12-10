@@ -2,6 +2,7 @@
 #define MOVE_ANGLE 90.0f
 #define MOVEMENT_STEP 0.1f
 #define BG_STEP 0.005f
+#define BG_STEP_ROT 0.01f
 #define MOUSE_SENSE 0.0005f
 #define Z_SPEED -0.01f
 #define BACKGROUND_SIZE 10000.0f
@@ -19,7 +20,7 @@
 #define HOMING_FACTOR 0.05f
 // Camera values
 #define ROTATION_FACTOR 50.0f
-#define ANTI_ROTATION_FACTOR 0.01
+#define ANTI_ROTATION_FACTOR 0.05
 #define MAX_ROT_X 45.0f
 #define MAX_ROT_Y 20.0f
 // Key bindings
@@ -37,8 +38,10 @@
 
 Engine::Engine(float backgroundRadius, float backgroundShininess,
 	float fovy, float zNear, float zFar, int _refreshRate)
-	:background(rng::roll(), rng::roll(),
-		rng::roll(), backgroundRadius, backgroundShininess,
+	:background(rng::roll(),
+		rng::roll(), rng::roll(), rng::roll(),
+		rng::roll(), rng::roll(), rng::roll(),
+		backgroundRadius, backgroundShininess,
 		1.0f, 1.0f, 1.0f,
 		0.0f, 0.0f, 0.0f, false),
 	camera(fovy, zNear, zFar),
@@ -191,85 +194,45 @@ void Engine::HandleKeyboardUp(unsigned char key, int x, int y)
 void Engine::HandleMouse(int button, int state, int x, int y)
 {}
 
-void Engine::ReturnToNorm()
-{
-	// Rotations
-	// Reset x rotation
-	if (spacecraft.rotation.z < 0)
-	{
-		spacecraft.rotation.z = std::min(spacecraft.rotation.z + SCREEN_RANGE, 0.0f);
-	}
-	else if (spacecraft.rotation.z > 0)
-	{
-		spacecraft.rotation.z = std::max(spacecraft.rotation.z - SCREEN_RANGE, 0.0f);
-	}
-	// Reset y rotation
-	if (spacecraft.rotation.x < 0)
-	{
-		spacecraft.rotation.x = std::min(spacecraft.rotation.x + SCREEN_RANGE, 0.0f);
-	}
-	else if (spacecraft.rotation.x > 0)
-	{
-		spacecraft.rotation.x = std::max(spacecraft.rotation.x - SCREEN_RANGE, 0.0f);
-	}
-}
 void Engine::MoveCraft()
 {
-	//if (startLevel) {
+	if (goingRight)
+	{
+		// Rotate and move right
+		spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0f, -MAX_ROT_X);
+		spacecraft.center.x = std::min(spacecraft.center.x + 0.02f, SCREEN_RANGE);
+		isRotating = true;
+	}
+	else if (goingLeft)
+	{
+		// Rotate and move left
+		spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0f, MAX_ROT_X);
+		spacecraft.center.x = std::max(spacecraft.center.x - 0.02f, -SCREEN_RANGE);
+		isRotating = true;
+	}
+	else
+	{
+		// Reset x rotation
+		spacecraft.rotation.z += -spacecraft.rotation.z * ANTI_ROTATION_FACTOR;
+	}
 
-		if (goingRight)
-		{
-			// Rotate and move right
-			spacecraft.rotation.z = std::max(spacecraft.rotation.z - 1.0f, -MAX_ROT_X);
-			spacecraft.center.x = std::min(spacecraft.center.x + 0.02f, SCREEN_RANGE);
-			isRotating = true;
-		}
-		else if (goingLeft)
-		{
-			// Rotate and move left
-			spacecraft.rotation.z = std::min(spacecraft.rotation.z + 1.0f, MAX_ROT_X);
-			spacecraft.center.x = std::max(spacecraft.center.x - 0.02f, -SCREEN_RANGE);
-			isRotating = true;
-		}
-		else
-		{
-			// Reset x rotation
-			if (spacecraft.rotation.z < 0)
-			{
-				spacecraft.rotation.z = std::min(spacecraft.rotation.z + SCREEN_RANGE, 0.0f);
-			}
-			else if (spacecraft.rotation.z > 0)
-			{
-				spacecraft.rotation.z = std::max(spacecraft.rotation.z - SCREEN_RANGE, 0.0f);
-			}
-
-		}
-
-		if (goingDown)
-		{
-			spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0f, -MAX_ROT_Y);
-			spacecraft.center.y = std::max(spacecraft.center.y - 0.02f, -SCREEN_RANGE);
-			isRotating = true;
-		}
-		else if (goingUp)
-		{
-			spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0f, MAX_ROT_Y);
-			spacecraft.center.y = std::min(spacecraft.center.y + 0.02f, SCREEN_RANGE);
-			isRotating = true;
-		}
-		else
-		{
-			// Reset y rotation
-			if (spacecraft.rotation.x < 0)
-			{
-				spacecraft.rotation.x = std::min(spacecraft.rotation.x + SCREEN_RANGE, 0.0f);
-			}
-			else if (spacecraft.rotation.x > 0)
-			{
-				spacecraft.rotation.x = std::max(spacecraft.rotation.x - SCREEN_RANGE, 0.0f);
-			}
-		}
-	//}
+	if (goingDown)
+	{
+		spacecraft.rotation.x = std::max(spacecraft.rotation.x - 1.0f, -MAX_ROT_Y);
+		spacecraft.center.y = std::max(spacecraft.center.y - 0.02f, -SCREEN_RANGE);
+		isRotating = true;
+	}
+	else if (goingUp)
+	{
+		spacecraft.rotation.x = std::min(spacecraft.rotation.x + 1.0f, MAX_ROT_Y);
+		spacecraft.center.y = std::min(spacecraft.center.y + 0.02f, SCREEN_RANGE);
+		isRotating = true;
+	}
+	else
+	{
+		// Reset y rotation
+		spacecraft.rotation.x += -spacecraft.rotation.x * ANTI_ROTATION_FACTOR;
+	}
 }
 
 void Engine::MoveCamera()
@@ -309,17 +272,10 @@ void Engine::HandleAnim(int dummy)
 	background.countGreen += BG_STEP;
 	background.countBlue += BG_STEP;
 
-	//return to original pos
-	if (!isRotating && keyBoardControl)
-	{
-		ReturnToNorm();
-	}
-	else if (keyBoardControl)
+	if (keyBoardControl)
 	{
 		MoveCraft();
 	}
-	isRotating = goingDown || goingUp || goingLeft || goingRight;
-
 	// Check game over conditions
 	CheckGameOver();
 	if (gameOver)
