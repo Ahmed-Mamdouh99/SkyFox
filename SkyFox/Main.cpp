@@ -58,8 +58,11 @@ void main(int argc, char** argv)
 	{
 		using namespace irrklang;
 		ISoundEngine* engine = createIrrKlangDevice();
-		//if (!engine)
-		//	printf("Failed to start sound engine\n");
+		if (!engine)
+		{
+			fprintf(stderr, "Failed to start sound engine\n");
+			exit(EXIT_FAILURE);
+		}
 		engine->play2D("sound/retro game.mp3", true);
 	}
 	// Run main loop
