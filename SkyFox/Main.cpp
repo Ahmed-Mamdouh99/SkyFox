@@ -1,6 +1,7 @@
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 #include "Render.h"
 #include "Engine.h"
+#include "irrKlang.h"
 #include <glut.h>
 // Parameters and Settings
 #define FPS 60
@@ -12,6 +13,8 @@
 #define REFRESH_RATE 1000.0/FPS
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
+
+#pragma comment(lib, "irrKlang.lib")
 
 namespace global {
 	Engine* engine;
@@ -52,6 +55,16 @@ void main(int argc, char** argv)
 	glutPassiveMotionFunc([](int x, int y) {global::engine->HandlePassiveMotion(x, y); });
 	glutReshapeFunc([](int width, int height) {global::engine->HandleReshape(width, height); });
 	glutTimerFunc(REFRESH_RATE, animate, 0);
+	{
+		using namespace irrklang;
+		ISoundEngine* engine = createIrrKlangDevice();
+		if (!engine)
+		{
+			fprintf(stderr, "Failed to start sound engine\n");
+			exit(EXIT_FAILURE);
+		}
+		engine->play2D("sound/retro game.mp3", true);
+	}
 	// Run main loop
 	glutMainLoop();
 }

@@ -13,6 +13,6 @@ namespace rng {
 			initialized = true;
 		}
 		float range = upper_bound - lower_bound;
-		return range * ((float)rand()) / RAND_MAX + lower_bound;
+		return range * ((float)rand() / RAND_MAX) + lower_bound;
 	}
 };

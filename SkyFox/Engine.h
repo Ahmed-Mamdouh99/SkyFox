@@ -6,6 +6,7 @@
 #include "rng.h"
 #include "Structs.h"
 #include "SolidQuad.h"
+#include "MovingQuad.h"
 #include <glut.h>
 
 class Engine
@@ -23,19 +24,40 @@ public:
 	Background_t* GetBackground();
 	Camera_t* GetCamera();
 	SolidQuad* GetSpacecraft();
-	std::vector<SolidQuad*>* GetCommets();
+	std::vector<MovingQuad*>* GetCommets();
+	int GetLevel();
+	int GetScene();
+	int GetScore();
+	bool GetStartLevel();
+	bool GetGameOver();
 private:
-	std::vector<SolidQuad*> commets;
+	std::vector<MovingQuad*> commets;
 	SolidQuad spacecraft;
 	// State management variables and flags
-	bool cameraThirdPerson;
+	bool cameraThirdPerson = true;
+	int level = 0;
+	int scene = 0;
+	int score = 0;
+	bool isRotating = false;
+	bool keyBoardControl = true;
+	bool goingLeft = false;
+	bool goingRight = false;
+	bool goingUp = false;
+	bool goingDown = false;
+
+	bool startLevel = false;
+	bool gameOver = false;
 	// Environment variables
 	Camera_t camera;
 	Background_t background;
 	int refreshRate;
 	// Private methods
-	void SwitchToThirdPerson();
-	void SwitchToFirstPerson();
 	void SetCameraPosition();
+	void MoveCamera();
+	void CreateCommets();
+	void RecreateCommets();
+	void MoveCommets();
+	void MoveCraft();
+	void CheckGameOver();
 };
 
